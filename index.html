@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Testing Drag and Drop</title>
+<style>
+  body {
+    user-select: none;
+  }
+
+  #draggable {
+    text-align: center;
+    background: white;
+  }
+
+  .dropzone {
+    width: 200px;
+    height: 20px;
+    background: blueviolet;
+    margin: 10px;
+    padding: 10px;
+  }
+
+  .dropzone.dragover {
+    background-color: purple;
+  }
+
+  .dragging {
+    opacity: 0.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="dropzone">
+  <div id="draggable" draggable="true">This div is draggable</div>
+</div>
+<div class="dropzone" id="droptarget"></div>
+
+<script>
+    let dragged;
+  
+    function dragStart(event) {
+      dragged = event.target;
+      event.target.classList.add("dragging");
+    }
+  
+    function dragEnd(event) {
+      event.target.classList.remove("dragging");
+    }
+
+    const source = document.getElementById("draggable");
+    source.addEventListener("drag", (event) => {
+      console.log("dragging");
+    });
+  
+    source.addEventListener("dragstart", dragStart);
+  
+    source.addEventListener("dragend", dragEnd);
+
+    const dropzones = document.querySelectorAll(".dropzone");
+    dropzones.forEach((dropzone) => {
+      dropzone.addEventListener(
+        "dragover",
+        (event) => {
+          event.preventDefault();
+        },
+        false
+      );
+  
+      dropzone.addEventListener("dragenter", (event) => {
+        if (event.target.classList.contains("dropzone")) {
+          event.target.classList.add("dragover");
+        }
+      });
+  
+      dropzone.addEventListener("dragleave", (event) => {
+        if (event.target.classList.contains("dropzone")) {
+          event.target.classList.remove("dragover");
+        }
+      });
+  
+      dropzone.addEventListener("drop", (event) => {
+        event.preventDefault();
+        if (event.target.classList.contains("dropzone")) {
+          event.target.classList.remove("dragover");
+          event.target.appendChild(dragged);
+          document.getElementById("droptarget").removeAttribute("id");
+          event.target.id = "droptarget";
+          dragged.addEventListener("dragstart", dragStart);
+          dragged.addEventListener("dragend", dragEnd);
+        }
+      });
+    });
+  </script>
+  
+
+</body>
+</html>
