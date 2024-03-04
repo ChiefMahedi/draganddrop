@@ -6,95 +6,91 @@
 <title>Testing Drag and Drop</title>
 <style>
   body {
+    font-family: Arial, sans-serif;
     user-select: none;
-  }
-
-  #draggable {
-    text-align: center;
-    background: white;
   }
 
   .dropzone {
     width: 200px;
-    height: 20px;
-    background: blueviolet;
+    height: 100px;
+    background: #f0f0f0;
     margin: 10px;
     padding: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
   }
 
   .dropzone.dragover {
-    background-color: purple;
+    background-color: #e0e0e0;
   }
 
-  .dragging {
+  .draggable {
+    cursor: move;
+    user-select: none;
+    background-color: #fff;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    transition: opacity 0.3s ease;
+  }
+
+  .draggable.dragging {
     opacity: 0.5;
   }
 </style>
 </head>
 <body>
 
-<div class="dropzone">
-  <div id="draggable" draggable="true">This div is draggable</div>
+<div class="dropzone" id="droptarget">
+  <div class="draggable" draggable="true">Drag me</div>
 </div>
-<div class="dropzone" id="droptarget"></div>
+<div class="dropzone"></div>
 
 <script>
-    let dragged;
-  
-    function dragStart(event) {
-      dragged = event.target;
-      event.target.classList.add("dragging");
-    }
-  
-    function dragEnd(event) {
-      event.target.classList.remove("dragging");
-    }
+  let dragged;
 
-    const source = document.getElementById("draggable");
-    source.addEventListener("drag", (event) => {
-      console.log("dragging");
-    });
-  
-    source.addEventListener("dragstart", dragStart);
-  
-    source.addEventListener("dragend", dragEnd);
+  function dragStart(event) {
+    dragged = event.target;
+    event.target.classList.add("dragging");
+  }
 
-    const dropzones = document.querySelectorAll(".dropzone");
-    dropzones.forEach((dropzone) => {
-      dropzone.addEventListener(
-        "dragover",
-        (event) => {
-          event.preventDefault();
-        },
-        false
-      );
-  
-      dropzone.addEventListener("dragenter", (event) => {
-        if (event.target.classList.contains("dropzone")) {
-          event.target.classList.add("dragover");
-        }
-      });
-  
-      dropzone.addEventListener("dragleave", (event) => {
-        if (event.target.classList.contains("dropzone")) {
-          event.target.classList.remove("dragover");
-        }
-      });
-  
-      dropzone.addEventListener("drop", (event) => {
-        event.preventDefault();
-        if (event.target.classList.contains("dropzone")) {
-          event.target.classList.remove("dragover");
-          event.target.appendChild(dragged);
-          document.getElementById("droptarget").removeAttribute("id");
-          event.target.id = "droptarget";
-          dragged.addEventListener("dragstart", dragStart);
-          dragged.addEventListener("dragend", dragEnd);
-        }
-      });
+  function dragEnd(event) {
+    event.target.classList.remove("dragging");
+  }
+
+  const draggables = document.querySelectorAll(".draggable");
+  draggables.forEach((draggable) => {
+    draggable.addEventListener("dragstart", dragStart);
+    draggable.addEventListener("dragend", dragEnd);
+  });
+
+  const dropzones = document.querySelectorAll(".dropzone");
+  dropzones.forEach((dropzone) => {
+    dropzone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      if (!event.target.classList.contains("dropzone")) return;
+      event.target.classList.add("dragover");
     });
-  </script>
-  
+
+    dropzone.addEventListener("dragenter", (event) => {
+      if (!event.target.classList.contains("dropzone")) return;
+      event.target.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", (event) => {
+      if (!event.target.classList.contains("dropzone")) return;
+      event.target.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      if (!event.target.classList.contains("dropzone")) return;
+      event.target.classList.remove("dragover");
+      event.target.appendChild(dragged);
+    });
+  });
+</script>
 
 </body>
 </html>
